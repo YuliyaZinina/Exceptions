@@ -21,13 +21,17 @@ public class Main {
         String[] inputDataArray = inputData.split(" ");
         System.out.println(Arrays.toString(inputDataArray));
         int countExpected = 6;
-        Boolean isDataCountCorrect = isDataCountCorrect(inputDataArray, countExpected);
+        try {
+            checkDataCount(inputDataArray, countExpected);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         // Если по количеству данные верны, проверим данные на типы
         Boolean isDataTypeCorrect = true;
-        if (isDataCountCorrect) {
-            isDataTypeCorrect = isDataCorrect(inputDataArray);
-        }
+        isDataTypeCorrect = isDataCorrect(inputDataArray);
+        
 
         // Если по типу данные верны, формируем строку для записи
         String data = "";
@@ -54,17 +58,26 @@ public class Main {
     }
 
     // Проверим данные по количеству
-    public static Boolean isDataCountCorrect(String[] inputDataArray, int countExpected) {
-        if (inputDataArray.length == countExpected){
-            return true;
-        } else if (inputDataArray.length > 6){
-            System.out.printf("Вы ввели лишние данные");
-            return false;
-        } else {
-            System.out.printf("Вы ввели недостаточно данных");
-            return false;
+    // public static Boolean isDataCountCorrect(String[] inputDataArray, int countExpected) {
+    //     if (inputDataArray.length == countExpected){
+    //         return true;
+    //     } else if (inputDataArray.length > 6){
+    //         System.out.printf("Вы ввели лишние данные");
+    //         return false;
+    //     } else {
+    //         System.out.printf("Вы ввели недостаточно данных");
+    //         return false;
+    //     }
+    // }
+
+    public static void checkDataCount(String[] inputDataArray, int count) throws Exception {
+        if (inputDataArray.length > count){
+          throw new Exception("Вы ввели лишние данные");
         }
-    }
+        if (inputDataArray.length < count){
+          throw new Exception("Вы ввели недостаточно данных");
+        }
+      }
 
     //Проверим типы данных
     public static Boolean isDataCorrect(String[] inputDataArray) {
