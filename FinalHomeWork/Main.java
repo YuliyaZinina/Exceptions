@@ -13,7 +13,7 @@ import java.util.Scanner;
  * Main
  */
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws DataCountException, DataFormatException {
         //Получаем данные от пользователя
         String inputData = getInputData();
 
@@ -21,28 +21,15 @@ public class Main {
         String[] inputDataArray = inputData.split(" ");
         System.out.println(Arrays.toString(inputDataArray));
         int countExpected = 6;
-        try {
-            checkDataCount(inputDataArray, countExpected);
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        checkDataCount(inputDataArray, countExpected);
 
         // Если по количеству данные верны, проверим данные на типы
-        Boolean isDataTypeCorrect = true;
-        isDataTypeCorrect = isDataCorrect(inputDataArray);
-        
+        checkData(inputDataArray);
 
         // Если по типу данные верны, формируем строку для записи
-        String data = "";
-        if (isDataTypeCorrect){
-            data = arrayToString(inputDataArray);
-            // Запишем данные в файл
-            writeDataToFile(inputDataArray, data);
-        }
-        
-        
-        
+        String data = arrayToString(inputDataArray);
+        // Запишем данные в файл
+        writeDataToFile(inputDataArray, data);
     }
 
     //Запрашиваем и получаем данные от пользователя
@@ -57,62 +44,40 @@ public class Main {
         return inputData;
     }
 
-    // Проверим данные по количеству
-    // public static Boolean isDataCountCorrect(String[] inputDataArray, int countExpected) {
-    //     if (inputDataArray.length == countExpected){
-    //         return true;
-    //     } else if (inputDataArray.length > 6){
-    //         System.out.printf("Вы ввели лишние данные");
-    //         return false;
-    //     } else {
-    //         System.out.printf("Вы ввели недостаточно данных");
-    //         return false;
-    //     }
-    // }
-
-    public static void checkDataCount(String[] inputDataArray, int count) throws Exception {
+    public static void checkDataCount(String[] inputDataArray, int count) throws DataCountException {
         if (inputDataArray.length > count){
-          throw new Exception("Вы ввели лишние данные");
+          throw new DataCountException("Вы ввели лишние данные");
         }
         if (inputDataArray.length < count){
-          throw new Exception("Вы ввели недостаточно данных");
+          throw new DataCountException("Вы ввели недостаточно данных");
         }
-      }
+    }
 
-    //Проверим типы данных
-    public static Boolean isDataCorrect(String[] inputDataArray) {
-        Boolean isDataCorrect = true;
+    public static void checkData(String[] data) throws DataFormatException {
         // проверим ФИО
-        for (int i = 0; i<3; i++){
-            boolean isLetterString = inputDataArray[i] != null &&
-            inputDataArray[i].chars().allMatch(Character::isLetter);
-            System.out.printf("%s - %b \n", inputDataArray[i], isLetterString);
+        for (int i = 0; i < 3; i++) {
+            boolean isLetterString = data[i] != null &&
+                    data[i].chars().allMatch(Character::isLetter);
+            System.out.printf("%s - %b \n", data[i], isLetterString);
             if (!isLetterString) {
-                isDataCorrect = false;
-                break;
+                throw new DataFormatException("Неверный формат ФИО");
             }
         }
         // Проверим дату рождения
         DateFormat sdf = new SimpleDateFormat("dd.mm.yyyy");
         sdf.setLenient(false);
         try {
-            sdf.parse(inputDataArray[3]);
-            System.out.printf("%s - true \n", inputDataArray[3]);
+            sdf.parse(data[3]);
+            System.out.printf("%s - true \n", data[3]);
         } catch (ParseException e) {
-            isDataCorrect = false;
-            System.out.println("Неверный формат даты");
+            throw new DataFormatException("Неверный формат даты");
         }
 
         // Проверим номер телефона
-        try {
-            Integer.parseInt(inputDataArray[4]);
-            System.out.printf("%s - true \n", inputDataArray[4]);
-        } catch (NumberFormatException e) {
-            System.out.println("Неверный формат номера телефона");
+        String regex = "^\\d{11}$";
+        if (!data[4].matches(regex)) {
+            throw new DataFormatException("Неверный формат номера телефона");
         }
-
-        return isDataCorrect;
-
     }
 
     // формируем строку для записи
